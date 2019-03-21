@@ -1,0 +1,7 @@
+author: pauhull
+version: 1.0
+main: de.pauhull.candyparty.CandyParty
+name: CandyParty
+
+commands:
+  setlocation:

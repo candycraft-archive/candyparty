@@ -1,0 +1,11 @@
+MySQL:
+  SSL: false
+  Host: "127.0.0.1"
+  Port: "3306"
+  Database: "database"
+  User: "root"
+  Password: ""
+
+Enabled: False
+MinPlayers: 4
+MaxPlayers: 32
