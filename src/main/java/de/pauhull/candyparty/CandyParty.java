@@ -1,6 +1,10 @@
 package de.pauhull.candyparty;
 
+import de.pauhull.candyparty.command.SetLocationCommand;
 import de.pauhull.candyparty.display.LobbyScoreboard;
+import de.pauhull.candyparty.inventory.MinigamePickInventory;
+import de.pauhull.candyparty.listener.*;
+import de.pauhull.candyparty.manager.ItemManager;
 import de.pauhull.candyparty.manager.LocationManager;
 import de.pauhull.candyparty.phase.GamePhaseHandler;
 import de.pauhull.candyparty.phase.type.LobbyPhase;
@@ -29,13 +33,13 @@ public class CandyParty extends JavaPlugin {
     private ScoreboardManager scoreboardManager;
 
     @Getter
-    private GamePhaseHandler gamePhaseHandler;
+    private GamePhaseHandler phaseHandler;
 
     @Getter
     private FileConfiguration config;
 
     @Getter
-    private boolean enabled;
+    private boolean pluginEnabled;
 
     @Getter
     private int minPlayers, maxPlayers;
@@ -43,19 +47,37 @@ public class CandyParty extends JavaPlugin {
     @Getter
     private LocationManager locationManager;
 
+    @Getter
+    private ItemManager itemManager;
+
+    @Getter
+    private MinigamePickInventory minigamePickInventory;
+
     @Override
     public void onEnable() {
         instance = this;
 
         this.scoreboardManager = new ScoreboardManager(this, LobbyScoreboard.class);
         this.locationManager = new LocationManager(this);
-        this.gamePhaseHandler = new GamePhaseHandler();
+        this.itemManager = new ItemManager(this);
+        this.phaseHandler = new GamePhaseHandler();
         this.config = copyAndLoad("config.yml", new File(getDataFolder(), "config.yml"));
-        this.enabled = config.getBoolean("Enabled");
+        this.pluginEnabled = config.getBoolean("Enabled");
         this.minPlayers = config.getInt("MinPlayers");
         this.maxPlayers = config.getInt("MaxPlayers");
+        this.minigamePickInventory = new MinigamePickInventory(this);
 
-        this.gamePhaseHandler.startPhase(LobbyPhase.class);
+        if (pluginEnabled) {
+            this.phaseHandler.startPhase(LobbyPhase.class);
+            new PlayerInteractListener(this);
+            new PlayerJoinListener(this);
+            new PlayerQuitListener(this);
+            new BlockBreakListener(this);
+            new BlockPlaceListener(this);
+        }
+
+        new SetLocationCommand(this);
+
     }
 
     @Override
